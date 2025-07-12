@@ -55,9 +55,9 @@ export function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) 
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+                  <AvatarImage src={currentUser.avatar_url} alt={currentUser.name} />
                   <AvatarFallback className="text-2xl">
-                    {currentUser.name.split(' ').map((n: string) => n[0]).join('')}
+                    {currentUser.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -71,7 +71,7 @@ export function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) 
                     <span className="capitalize">{currentUser.availability}</span>
                   </div>
                   <div className="flex items-center mt-2">
-                    {currentUser.isPublic ? (
+                    {currentUser.is_public ? (
                       <div className="flex items-center text-green-600">
                         <Eye className="h-4 w-4 mr-1" />
                         <span className="text-sm">Public Profile</span>
@@ -95,9 +95,9 @@ export function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) 
           <CardContent className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-green-700 mb-3">Skills I Can Teach</h3>
-              {currentUser.skillsOffered.length > 0 ? (
+              {(currentUser.skills_offered?.length || 0) > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {currentUser.skillsOffered.map((skill: string, index: number) => (
+                  {currentUser.skills_offered.map((skill: string, index: number) => (
                     <Badge key={index} variant="secondary" className="bg-green-100 text-green-800">
                       {skill}
                     </Badge>
@@ -110,9 +110,9 @@ export function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) 
 
             <div>
               <h3 className="text-lg font-semibold text-blue-700 mb-3">Skills I Want to Learn</h3>
-              {currentUser.skillsWanted.length > 0 ? (
+              {(currentUser.skills_wanted?.length || 0) > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {currentUser.skillsWanted.map((skill: string, index: number) => (
+                  {currentUser.skills_wanted.map((skill: string, index: number) => (
                     <Badge key={index} variant="outline" className="border-blue-200 text-blue-800">
                       {skill}
                     </Badge>
@@ -123,7 +123,7 @@ export function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) 
               )}
             </div>
 
-            {(!currentUser.skillsOffered.length && !currentUser.skillsWanted.length) && (
+            {(!(currentUser.skills_offered?.length || 0) && !(currentUser.skills_wanted?.length || 0)) && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
                 <p className="text-blue-800 mb-2">Complete your profile to start skill swapping!</p>
                 <p className="text-blue-600 text-sm">Add skills you can teach and skills you want to learn to connect with others.</p>

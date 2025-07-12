@@ -7,14 +7,15 @@ import { MapPin, Clock } from "lucide-react";
 
 interface SkillCardProps {
   profile: {
-    id: string;
+    id?: string;
+    user_id: string;
     name: string;
     location: string;
-    avatar: string;
-    skillsOffered: string[];
-    skillsWanted: string[];
+    avatar_url: string;
+    skills_offered: string[];
+    skills_wanted: string[];
     availability: string;
-    isPublic: boolean;
+    is_public: boolean;
   };
   onRequest: (profileId: string) => void;
   showRequestButton: boolean;
@@ -26,8 +27,8 @@ export function SkillCard({ profile, onRequest, showRequestButton }: SkillCardPr
       <CardHeader className="pb-3">
         <div className="flex items-center space-x-3">
           <Avatar className="h-12 w-12">
-            <AvatarImage src={profile.avatar} alt={profile.name} />
-            <AvatarFallback>{profile.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+            <AvatarImage src={profile.avatar_url} alt={profile.name} />
+            <AvatarFallback>{profile.name?.split(' ').map(n => n[0]).join('') || 'U'}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg truncate">{profile.name}</h3>
@@ -43,7 +44,7 @@ export function SkillCard({ profile, onRequest, showRequestButton }: SkillCardPr
         <div>
           <h4 className="text-sm font-medium text-green-700 mb-2">Skills Offered</h4>
           <div className="flex flex-wrap gap-1">
-            {profile.skillsOffered.map((skill, index) => (
+            {profile.skills_offered.map((skill, index) => (
               <Badge key={index} variant="secondary" className="text-xs bg-green-100 text-green-800">
                 {skill}
               </Badge>
@@ -54,7 +55,7 @@ export function SkillCard({ profile, onRequest, showRequestButton }: SkillCardPr
         <div>
           <h4 className="text-sm font-medium text-blue-700 mb-2">Skills Wanted</h4>
           <div className="flex flex-wrap gap-1">
-            {profile.skillsWanted.map((skill, index) => (
+            {profile.skills_wanted.map((skill, index) => (
               <Badge key={index} variant="outline" className="text-xs border-blue-200 text-blue-800">
                 {skill}
               </Badge>
@@ -71,7 +72,7 @@ export function SkillCard({ profile, onRequest, showRequestButton }: SkillCardPr
       {showRequestButton && (
         <CardFooter>
           <Button 
-            onClick={() => onRequest(profile.id)} 
+            onClick={() => onRequest(profile.user_id)}
             className="w-full bg-blue-600 hover:bg-blue-700"
           >
             Request Swap

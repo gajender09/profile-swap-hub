@@ -24,11 +24,14 @@ export function HomePage({ currentUser, profiles, onSendRequest }: HomePageProps
   const itemsPerPage = 6;
 
   const filteredProfiles = profiles.filter(profile => {
-    if (!profile.isPublic) return false;
+    if (!profile.is_public) return false;
     
-    const matchesSearch = profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      profile.skillsOffered.some((skill: string) => skill.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      profile.skillsWanted.some((skill: string) => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+    const skillsOffered = profile.skills_offered || [];
+    const skillsWanted = profile.skills_wanted || [];
+    
+    const matchesSearch = profile.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      skillsOffered.some((skill: string) => skill.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      skillsWanted.some((skill: string) => skill.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesAvailability = availabilityFilter === 'all' || profile.availability === availabilityFilter;
     
@@ -49,7 +52,7 @@ export function HomePage({ currentUser, profiles, onSendRequest }: HomePageProps
       return;
     }
 
-    const profile = profiles.find(p => p.id === profileId);
+    const profile = profiles.find(p => p.user_id === profileId);
     setSelectedProfile(profile);
     setIsModalOpen(true);
   };
@@ -119,7 +122,7 @@ export function HomePage({ currentUser, profiles, onSendRequest }: HomePageProps
               key={profile.id}
               profile={profile}
               onRequest={handleRequestSwap}
-              showRequestButton={!!currentUser && profile.id !== currentUser?.id}
+              showRequestButton={!!currentUser && profile.user_id !== currentUser?.user_id}
             />
           ))}
         </div>
@@ -175,7 +178,7 @@ export function HomePage({ currentUser, profiles, onSendRequest }: HomePageProps
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           targetProfile={selectedProfile}
-          currentUserSkills={currentUser?.skillsOffered || []}
+          currentUserSkills={currentUser?.skills_offered || []}
           onSubmit={handleSendRequest}
         />
       </div>

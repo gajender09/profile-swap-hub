@@ -24,7 +24,7 @@ export function RequestsPage({ currentUser, requests, onUpdateRequest }: Request
   }
 
   const userRequests = requests.filter(request => 
-    request.fromUserId === currentUser.id || request.toUserId === currentUser.id
+    request.from_user_id === currentUser.user_id || request.to_user_id === currentUser.user_id
   );
 
   const filteredRequests = userRequests.filter(request => {
@@ -111,15 +111,33 @@ export function RequestsPage({ currentUser, requests, onUpdateRequest }: Request
             <TabsContent key={tab} value={tab}>
               <div className="space-y-4">
                 {filteredRequests.length > 0 ? (
-                  filteredRequests.map((request) => (
-                    <RequestCard
-                      key={request.id}
-                      request={request}
-                      currentUserId={currentUser.id}
-                      onAccept={handleAcceptRequest}
-                      onReject={handleRejectRequest}
-                    />
-                  ))
+                  filteredRequests.map((request) => {
+                    // Transform request data to match RequestCard interface
+                    const transformedRequest = {
+                      id: request.id,
+                      fromUserId: request.from_user_id,
+                      fromUserName: request.from_profile?.name || 'Unknown User',
+                      fromUserAvatar: request.from_profile?.avatar_url || '',
+                      toUserId: request.to_user_id,
+                      toUserName: request.to_profile?.name || 'Unknown User',
+                      toUserAvatar: request.to_profile?.avatar_url || '',
+                      mySkill: request.my_skill,
+                      theirSkill: request.their_skill,
+                      message: request.message || '',
+                      status: request.status,
+                      createdAt: request.created_at,
+                    };
+
+                    return (
+                      <RequestCard
+                        key={request.id}
+                        request={transformedRequest}
+                        currentUserId={currentUser.user_id}
+                        onAccept={handleAcceptRequest}
+                        onReject={handleRejectRequest}
+                      />
+                    );
+                  })
                 ) : (
                   <div className="text-center py-12">
                     <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />

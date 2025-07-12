@@ -40,8 +40,8 @@ export function Header({ currentUser, onLogout }: HeaderProps) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
-                    <AvatarFallback>{currentUser.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+                    <AvatarImage src={currentUser.avatar_url} alt={currentUser.name} />
+                    <AvatarFallback>{currentUser.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
