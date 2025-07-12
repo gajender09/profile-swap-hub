@@ -1,73 +1,55 @@
-# Welcome to your Lovable project
+# 🔁 SkillBridge – Skill Swap Platform
 
-## Project info
+## 📝 Problem Statement
 
-**URL**: https://lovable.dev/projects/8a575b80-5c2c-41ce-8794-ce9913d72976
+**Skill Swap Platform** – a full-stack web application that enables users to:
 
-## How can I edit this code?
+- Create and manage skill profiles
+- List skills they can offer and those they want to learn
+- Set availability (weekends, evenings, etc.)
+- Mark profiles public or private
+- Browse and filter other users by skills or availability
+- Send, accept, reject, or cancel skill swap requests
+- View swap request history and status
+- Leave feedback after swaps
 
-There are several ways of editing your application.
+The goal is to encourage collaborative learning through peer-to-peer skill sharing.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8a575b80-5c2c-41ce-8794-ce9913d72976) and start prompting.
+## 👥 Team Name
+**Team 2302**
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📧 Team Lead Email
+**mandiwalgajender0001@gmail.com**
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🔗 Live Project URL
+[https://lovable.dev/projects/8a575b80-5c2c-41ce-8794-ce9913d72976](https://lovable.dev/projects/8a575b80-5c2c-41ce-8794-ce9913d72976)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🚀 Tech Stack
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Frontend:** React + TypeScript (via Vite)
+- **UI Library:** shadcn/ui
+- **Styling:** Tailwind CSS
+- **Hosting & Dev:** Lovable.dev
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 💻 Local Development Setup
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+# Step 1: Clone the repository
+git clone https://github.com/gajender09/profile-swap-hub.git
+
+# Step 2: Navigate to the project directory
+cd profile-swap-hub
+
+# Step 3: Install dependencies
+npm install
+
+# Step 4: Run the dev server
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/8a575b80-5c2c-41ce-8794-ce9913d72976) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
