@@ -25,11 +25,6 @@ The goal is to encourage collaborative learning through peer-to-peer skill shari
 
 ---
 
-## 🔗 Live Project URL
-[https://lovable.dev/projects/8a575b80-5c2c-41ce-8794-ce9913d72976](https://lovable.dev/projects/8a575b80-5c2c-41ce-8794-ce9913d72976)
-
----
-
 ## 🚀 Tech Stack
 
 - **Frontend:** React + TypeScript (via Vite)
