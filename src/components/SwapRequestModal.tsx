@@ -27,7 +27,7 @@ export function SwapRequestModal({ isOpen, onClose, targetProfile, currentUserSk
       mySkill,
       theirSkill,
       message,
-      targetUserId: targetProfile.id,
+      targetUserId: targetProfile.user_id,
       targetUserName: targetProfile.name,
     });
 
@@ -72,7 +72,7 @@ export function SwapRequestModal({ isOpen, onClose, targetProfile, currentUserSk
                 <SelectValue placeholder="Select a skill they offer" />
               </SelectTrigger>
               <SelectContent>
-                {targetProfile?.skillsOffered?.map((skill: string) => (
+                {targetProfile?.skills_offered?.map((skill: string) => (
                   <SelectItem key={skill} value={skill}>
                     {skill}
                   </SelectItem>

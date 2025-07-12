@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,75 +13,12 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { RequestsPage } from "@/pages/RequestsPage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import NotFound from "./pages/NotFound";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from '@supabase/supabase-js';
 
 const queryClient = new QueryClient();
-
-// Mock data
-const mockProfiles = [
-  {
-    id: '1',
-    name: 'Sarah Chen',
-    location: 'San Francisco, CA',
-    avatar: '',
-    skillsOffered: ['Python', 'Data Science', 'Machine Learning'],
-    skillsWanted: ['React', 'UI Design'],
-    availability: 'weekends',
-    isPublic: true,
-  },
-  {
-    id: '2',
-    name: 'Mike Johnson',
-    location: 'New York, NY',
-    avatar: '',
-    skillsOffered: ['React', 'JavaScript', 'Node.js'],
-    skillsWanted: ['Python', 'DevOps'],
-    availability: 'evenings',
-    isPublic: true,
-  },
-  {
-    id: '3',
-    name: 'Lisa Rodriguez',
-    location: 'Austin, TX',
-    avatar: '',
-    skillsOffered: ['UI Design', 'Figma', 'Adobe Creative Suite'],
-    skillsWanted: ['Vue.js', 'Animation'],
-    availability: 'flexible',
-    isPublic: true,
-  },
-  {
-    id: '4',
-    name: 'David Kim',
-    location: 'Seattle, WA',
-    avatar: '',
-    skillsOffered: ['Java', 'Spring Boot', 'System Design'],
-    skillsWanted: ['Cloud Architecture', 'Kubernetes'],
-    availability: 'weekdays',
-    isPublic: true,
-  },
-  {
-    id: '5',
-    name: 'Emma Wilson',
-    location: 'Chicago, IL',
-    avatar: '',
-    skillsOffered: ['Marketing', 'Content Writing', 'SEO'],
-    skillsWanted: ['Web Analytics', 'Social Media'],
-    availability: 'weekends',
-    isPublic: true,
-  },
-  {
-    id: '6',
-    name: 'Alex Thompson',
-    location: 'Boston, MA',
-    avatar: '',
-    skillsOffered: ['DevOps', 'Docker', 'AWS'],
-    skillsWanted: ['Machine Learning', 'Data Engineering'],
-    availability: 'evenings',
-    isPublic: true,
-  },
-];
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -101,12 +39,17 @@ const App = () => {
         if (session?.user) {
           // Fetch user profile when logged in
           setTimeout(async () => {
-            const { data: profile } = await supabase
+            const { data: profile, error } = await supabase
               .from('profiles')
               .select('*')
               .eq('user_id', session.user.id)
-              .single();
-            setUserProfile(profile);
+              .maybeSingle();
+            
+            if (error) {
+              console.error('Error fetching profile:', error);
+            } else {
+              setUserProfile(profile);
+            }
           }, 0);
         } else {
           setUserProfile(null);
@@ -114,16 +57,28 @@ const App = () => {
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check for existing session and fetch profile
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
-    });
+      
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        setUserProfile(profile);
+      }
+    };
+
+    initializeAuth();
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch profiles
+  // Fetch profiles and set up real-time updates
   useEffect(() => {
     const fetchProfiles = async () => {
       const { data, error } = await supabase
@@ -131,13 +86,36 @@ const App = () => {
         .select('*')
         .eq('is_public', true);
       
-      if (data) {
-        setProfiles(data);
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load profiles. Please refresh the page.",
+          variant: "destructive",
+        });
+      } else {
+        setProfiles(data || []);
       }
       setLoading(false);
     };
 
     fetchProfiles();
+
+    // Set up real-time updates for profiles
+    const profilesChannel = supabase
+      .channel('profiles_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles'
+      }, () => {
+        fetchProfiles(); // Refetch when profiles change
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(profilesChannel);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -147,37 +125,112 @@ const App = () => {
   const handleUpdateProfile = async (updatedProfile: any) => {
     if (!user) return;
 
-    const { error } = await supabase
-      .from('profiles')
-      .update(updatedProfile)
-      .eq('user_id', user.id);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updatedProfile)
+        .eq('user_id', user.id);
 
-    if (!error) {
+      if (error) {
+        throw error;
+      }
+
       setUserProfile(prev => ({ ...prev, ...updatedProfile }));
       setProfiles(prev => prev.map(p => 
         p.user_id === user.id ? { ...p, ...updatedProfile } : p
       ));
+
+      toast({
+        title: "Profile updated!",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile.",
+        variant: "destructive",
+      });
+      throw error; // Re-throw to let the form handle it
     }
   };
 
   const handleSendRequest = async (request: any) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to send requests.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const newRequest = {
+        from_user_id: user.id,
+        to_user_id: request.targetUserId,
+        my_skill: request.mySkill,
+        their_skill: request.theirSkill,
+        message: request.message,
+      };
+      
+      const { error } = await supabase
+        .from('swap_requests')
+        .insert([newRequest]);
+
+      if (error) {
+        throw error;
+      }
+
+      // Refresh requests
+      await fetchUserRequests();
+
+      toast({
+        title: "Request sent!",
+        description: "Your skill swap request has been sent successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send request.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateRequest = async (requestId: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('swap_requests')
+        .update({ status })
+        .eq('id', requestId);
+
+      if (error) {
+        throw error;
+      }
+
+      setRequests(prev => prev.map(request => 
+        request.id === requestId ? { ...request, status } : request
+      ));
+
+      toast({
+        title: `Request ${status}!`,
+        description: `The skill swap request has been ${status}.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update request.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Function to fetch user requests
+  const fetchUserRequests = async () => {
     if (!user) return;
 
-    const newRequest = {
-      from_user_id: user.id,
-      to_user_id: request.targetUserId,
-      my_skill: request.mySkill,
-      their_skill: request.theirSkill,
-      message: request.message,
-    };
-    
-    const { error } = await supabase
-      .from('swap_requests')
-      .insert([newRequest]);
-
-    if (!error) {
-      // Refresh requests
-      const { data } = await supabase
+    try {
+      const { data, error } = await supabase
         .from('swap_requests')
         .select(`
           *,
@@ -186,42 +239,49 @@ const App = () => {
         `)
         .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`);
       
-      if (data) setRequests(data);
+      if (error) {
+        throw error;
+      }
+
+      setRequests(data || []);
+    } catch (error: any) {
+      console.error('Error fetching requests:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load requests.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleUpdateRequest = async (requestId: string, status: string) => {
-    const { error } = await supabase
-      .from('swap_requests')
-      .update({ status })
-      .eq('id', requestId);
-
-    if (!error) {
-      setRequests(prev => prev.map(request => 
-        request.id === requestId ? { ...request, status } : request
-      ));
-    }
-  };
-
-  // Fetch user requests
+  // Fetch user requests and set up real-time updates
   useEffect(() => {
     if (user) {
-      const fetchRequests = async () => {
-        const { data } = await supabase
-          .from('swap_requests')
-          .select(`
-            *,
-            from_profile:profiles!swap_requests_from_user_id_fkey(*),
-            to_profile:profiles!swap_requests_to_user_id_fkey(*)
-          `)
-          .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`);
-        
-        if (data) setRequests(data);
-      };
+      fetchUserRequests();
 
-      fetchRequests();
+      // Set up real-time updates for requests
+      const requestsChannel = supabase
+        .channel('requests_changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'swap_requests'
+        }, () => {
+          fetchUserRequests(); // Refetch when requests change
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(requestsChannel);
+      };
+    } else {
+      setRequests([]);
     }
   }, [user]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
