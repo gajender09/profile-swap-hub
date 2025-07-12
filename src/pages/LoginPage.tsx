@@ -3,12 +3,9 @@ import { useState } from "react";
 import { AuthForm } from "@/components/AuthForm";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-interface LoginPageProps {
-  onLogin: (user: any) => void;
-}
-
-export function LoginPage({ onLogin }: LoginPageProps) {
+export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -18,30 +15,22 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     setError('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock login - in real app, this would be an API call
-      const mockUser = {
-        id: '1',
-        name: 'John Doe',
-        email: email,
-        location: 'New York, USA',
-        avatar: '',
-        skillsOffered: ['JavaScript', 'React', 'Node.js'],
-        skillsWanted: ['Python', 'Machine Learning'],
-        availability: 'weekends',
-        isPublic: true,
-      };
-
-      onLogin(mockUser);
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      navigate('/');
+
+      if (error) {
+        setError(error.message);
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully logged in.",
+        });
+        navigate('/');
+      }
     } catch (err) {
-      setError('Invalid email or password');
+      setError('An unexpected error occurred');
     } finally {
       setLoading(false);
     }

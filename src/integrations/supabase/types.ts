@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          availability: string | null
+          avatar_url: string | null
+          created_at: string
+          id: string
+          is_public: boolean | null
+          location: string | null
+          name: string | null
+          skills_offered: string[] | null
+          skills_wanted: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          availability?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean | null
+          location?: string | null
+          name?: string | null
+          skills_offered?: string[] | null
+          skills_wanted?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          availability?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean | null
+          location?: string | null
+          name?: string | null
+          skills_offered?: string[] | null
+          skills_wanted?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      swap_requests: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          message: string | null
+          my_skill: string
+          status: string | null
+          their_skill: string
+          to_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          message?: string | null
+          my_skill: string
+          status?: string | null
+          their_skill: string
+          to_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          message?: string | null
+          my_skill?: string
+          status?: string | null
+          their_skill?: string
+          to_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
