@@ -10,9 +10,11 @@ interface RequestsPageProps {
   currentUser: any;
   requests: any[];
   onUpdateRequest: (requestId: string, status: string) => void;
+  onRateUser?: (swapRequestId: string, rating: number, feedback: string) => void;
+  onDeleteRequest?: (requestId: string) => void;
 }
 
-export function RequestsPage({ currentUser, requests, onUpdateRequest }: RequestsPageProps) {
+export function RequestsPage({ currentUser, requests, onUpdateRequest, onRateUser, onDeleteRequest }: RequestsPageProps) {
   const [activeTab, setActiveTab] = useState('all');
 
   if (!currentUser) {

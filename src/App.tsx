@@ -362,6 +362,74 @@ const App = () => {
     }
   }, [user]);
 
+  // Add rating and delete request handlers
+  const handleRateUser = async (swapRequestId: string, rating: number, feedback: string) => {
+    if (!user) return;
+    
+    try {
+      const swapRequest = requests.find(r => r.id === swapRequestId);
+      if (!swapRequest) return;
+      
+      const ratedUserId = swapRequest.fromUserId === user.id 
+        ? swapRequest.toUserId 
+        : swapRequest.fromUserId;
+
+      const { error } = await supabase
+        .from('swap_ratings')
+        .insert({
+          swap_request_id: swapRequestId,
+          rater_user_id: user.id,
+          rated_user_id: ratedUserId,
+          rating,
+          feedback: feedback.trim() || null
+        });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Rating submitted!",
+        description: "Thank you for your feedback."
+      });
+    } catch (error: any) {
+      console.error('Error submitting rating:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit rating",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteRequest = async (requestId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('swap_requests')
+        .delete()
+        .eq('id', requestId)
+        .eq('from_user_id', user.id)
+        .eq('status', 'pending');
+
+      if (error) throw error;
+      
+      // Remove from local state
+      setRequests(prev => prev.filter(r => r.id !== requestId));
+      
+      toast({
+        title: "Request deleted",
+        description: "Your request has been deleted."
+      });
+    } catch (error: any) {
+      console.error('Error deleting request:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete request",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return <LoadingScreen />;
   }
@@ -412,6 +480,8 @@ const App = () => {
                       currentUser={userProfile}
                       requests={requests}
                       onUpdateRequest={handleUpdateRequest}
+                      onRateUser={handleRateUser}
+                      onDeleteRequest={handleDeleteRequest}
                     />
                   </ProtectedRoute>
                 } 

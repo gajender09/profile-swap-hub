@@ -14,10 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action_type: string
+          admin_user_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_user_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_user_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      banned_users: {
+        Row: {
+          banned_at: string
+          banned_by: string
+          expires_at: string | null
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          banned_at?: string
+          banned_by: string
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          banned_at?: string
+          banned_by?: string
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           availability: string | null
           avatar_url: string | null
+          average_rating: number | null
           created_at: string
           id: string
           is_public: boolean | null
@@ -25,12 +110,15 @@ export type Database = {
           name: string | null
           skills_offered: string[] | null
           skills_wanted: string[] | null
+          total_ratings: number | null
+          total_swaps: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           availability?: string | null
           avatar_url?: string | null
+          average_rating?: number | null
           created_at?: string
           id?: string
           is_public?: boolean | null
@@ -38,12 +126,15 @@ export type Database = {
           name?: string | null
           skills_offered?: string[] | null
           skills_wanted?: string[] | null
+          total_ratings?: number | null
+          total_swaps?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           availability?: string | null
           avatar_url?: string | null
+          average_rating?: number | null
           created_at?: string
           id?: string
           is_public?: boolean | null
@@ -51,10 +142,50 @@ export type Database = {
           name?: string | null
           skills_offered?: string[] | null
           skills_wanted?: string[] | null
+          total_ratings?: number | null
+          total_swaps?: number | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      swap_ratings: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          rated_user_id: string
+          rater_user_id: string
+          rating: number
+          swap_request_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rated_user_id: string
+          rater_user_id: string
+          rating: number
+          swap_request_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rated_user_id?: string
+          rater_user_id?: string
+          rating?: number
+          swap_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "swap_ratings_swap_request_id_fkey"
+            columns: ["swap_request_id"]
+            isOneToOne: false
+            referencedRelation: "swap_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       swap_requests: {
         Row: {
@@ -89,6 +220,30 @@ export type Database = {
           their_skill?: string
           to_user_id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          role?: string
+          user_id?: string
         }
         Relationships: []
       }
