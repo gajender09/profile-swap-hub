@@ -33,11 +33,31 @@ export function RequestCard({ request, currentUserId, onAccept, onReject }: Requ
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'accepted': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-yellow-100 text-yellow-800';
+      case 'accepted': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
+      case 'rejected': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100';
+      default: return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
     }
   };
+
+  const getRequestText = () => {
+    if (isReceiver) {
+      return {
+        theyTeach: 'They offer:',
+        youTeach: 'You offer:',
+        theirSkill: request.mySkill,
+        yourSkill: request.theirSkill
+      };
+    } else {
+      return {
+        theyTeach: 'You offered:',
+        youTeach: 'They offer:',
+        theirSkill: request.mySkill,
+        yourSkill: request.theirSkill
+      };
+    }
+  };
+
+  const requestText = getRequestText();
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -62,32 +82,32 @@ export function RequestCard({ request, currentUserId, onAccept, onReject }: Requ
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <div className="bg-gray-50 rounded-lg p-3">
+        <div className="bg-muted/50 rounded-lg p-3">
           <div className="text-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-green-700 font-medium">
-                {isReceiver ? 'They teach:' : 'I teach:'}
+              <span className="text-green-700 dark:text-green-400 font-medium">
+                {requestText.theyTeach}
               </span>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
-                {isReceiver ? request.mySkill : request.theirSkill}
+              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                {requestText.theirSkill}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-blue-700 font-medium">
-                {isReceiver ? 'You teach:' : 'They teach:'}
+              <span className="text-blue-700 dark:text-blue-400 font-medium">
+                {requestText.youTeach}
               </span>
-              <Badge variant="outline" className="border-blue-200 text-blue-800">
-                {isReceiver ? request.theirSkill : request.mySkill}
+              <Badge variant="outline" className="border-blue-200 text-blue-800 dark:border-blue-800 dark:text-blue-400">
+                {requestText.yourSkill}
               </Badge>
             </div>
           </div>
         </div>
 
         {request.message && (
-          <div className="bg-blue-50 rounded-lg p-3">
+          <div className="bg-blue-50 dark:bg-blue-950/50 rounded-lg p-3">
             <div className="flex items-start space-x-2">
-              <MessageSquare className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-blue-900">{request.message}</p>
+              <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-blue-900 dark:text-blue-100">{request.message}</p>
             </div>
           </div>
         )}
@@ -96,8 +116,9 @@ export function RequestCard({ request, currentUserId, onAccept, onReject }: Requ
           <div className="flex gap-2">
             <Button 
               size="sm" 
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               onClick={() => onAccept?.(request.id)}
+              disabled={!onAccept}
             >
               <Check className="h-4 w-4 mr-1" />
               Accept
@@ -105,8 +126,9 @@ export function RequestCard({ request, currentUserId, onAccept, onReject }: Requ
             <Button 
               size="sm" 
               variant="outline" 
-              className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
+              className="flex-1 text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950/50"
               onClick={() => onReject?.(request.id)}
+              disabled={!onReject}
             >
               <X className="h-4 w-4 mr-1" />
               Reject

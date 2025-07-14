@@ -165,12 +165,35 @@ const App = () => {
     }
 
     try {
+      setLoading(true);
+      
+      // Check if request already exists
+      const { data: existingRequest } = await supabase
+        .from('swap_requests')
+        .select('id')
+        .eq('from_user_id', user.id)
+        .eq('to_user_id', request.targetUserId)
+        .eq('my_skill', request.mySkill)
+        .eq('their_skill', request.theirSkill)
+        .eq('status', 'pending')
+        .single();
+
+      if (existingRequest) {
+        toast({
+          title: "Request already exists",
+          description: "You've already sent a similar request to this user.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const newRequest = {
         from_user_id: user.id,
         to_user_id: request.targetUserId,
         my_skill: request.mySkill,
         their_skill: request.theirSkill,
-        message: request.message,
+        message: request.message?.trim() || null,
+        status: 'pending'
       };
       
       const { error } = await supabase
@@ -189,39 +212,53 @@ const App = () => {
         description: "Your skill swap request has been sent successfully.",
       });
     } catch (error: any) {
+      console.error('Error sending request:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to send request.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateRequest = async (requestId: string, status: string) => {
+    if (!user) return;
+    
     try {
+      setLoading(true);
       const { error } = await supabase
         .from('swap_requests')
-        .update({ status })
-        .eq('id', requestId);
+        .update({ 
+          status,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', requestId)
+        .eq('to_user_id', user.id); // Only allow updates by the recipient
 
       if (error) {
         throw error;
       }
 
+      // Update local state immediately for better UX
       setRequests(prev => prev.map(request => 
         request.id === requestId ? { ...request, status } : request
       ));
 
       toast({
-        title: `Request ${status}!`,
-        description: `The skill swap request has been ${status}.`,
+        title: status === 'accepted' ? "Request accepted!" : "Request rejected",
+        description: `You have ${status} the skill swap request.`
       });
     } catch (error: any) {
+      console.error('Error updating request:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to update request.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -230,20 +267,58 @@ const App = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch requests with profile information
+      const { data: requestsData, error: requestsError } = await supabase
         .from('swap_requests')
-        .select(`
-          *,
-          from_profile:profiles!swap_requests_from_user_id_fkey(*),
-          to_profile:profiles!swap_requests_to_user_id_fkey(*)
-        `)
-        .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`);
-      
-      if (error) {
-        throw error;
-      }
+        .select('*')
+        .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
 
-      setRequests(data || []);
+      if (requestsError) throw requestsError;
+
+      // Get all unique user IDs from requests
+      const userIds = new Set<string>();
+      requestsData?.forEach(request => {
+        userIds.add(request.from_user_id);
+        userIds.add(request.to_user_id);
+      });
+
+      // Fetch profiles for all users involved in requests
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, name, avatar_url')
+        .in('user_id', Array.from(userIds));
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user profiles
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.user_id, profile);
+      });
+      
+      // Transform the data to match the expected format
+      const transformedRequests = requestsData?.map(request => {
+        const fromProfile = profilesMap.get(request.from_user_id);
+        const toProfile = profilesMap.get(request.to_user_id);
+        
+        return {
+          id: request.id,
+          fromUserId: request.from_user_id,
+          fromUserName: fromProfile?.name || 'Unknown User',
+          fromUserAvatar: fromProfile?.avatar_url,
+          toUserId: request.to_user_id,
+          toUserName: toProfile?.name || 'Unknown User', 
+          toUserAvatar: toProfile?.avatar_url,
+          mySkill: request.my_skill,
+          theirSkill: request.their_skill,
+          message: request.message,
+          status: request.status,
+          createdAt: request.created_at
+        };
+      }) || [];
+
+      setRequests(transformedRequests);
     } catch (error: any) {
       console.error('Error fetching requests:', error);
       toast({
@@ -261,13 +336,21 @@ const App = () => {
 
       // Set up real-time updates for requests
       const requestsChannel = supabase
-        .channel('requests_changes')
+        .channel('swap_requests_changes')
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'swap_requests'
-        }, () => {
-          fetchUserRequests(); // Refetch when requests change
+        }, (payload) => {
+          console.log('Request change:', payload);
+          // Only refetch if the change involves the current user
+          const newRecord = payload.new as any;
+          const oldRecord = payload.old as any;
+          const record = newRecord || oldRecord;
+          
+          if (record && (record.from_user_id === user.id || record.to_user_id === user.id)) {
+            fetchUserRequests();
+          }
         })
         .subscribe();
 
