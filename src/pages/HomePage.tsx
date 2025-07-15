@@ -96,9 +96,11 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
           </div>
 
           <h1
-            className="text-5xl font-bold mb-4 text-transparent bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text 
-             drop-shadow-lg transition-all duration-500 ease-in-out 
-             hover:scale-105 hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.35)]"
+             className="text-6xl font-extrabold mb-6 leading-tight 
+             bg-gradient-to-r from-[#0f172a] via-[#3b82f6] to-[#0f172a] 
+             bg-clip-text text-transparent 
+             drop-shadow-md transition-all duration-500 ease-in-out 
+             hover:scale-105"
           >
             Skill Swap Network
           </h1>
