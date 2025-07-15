@@ -40,7 +40,7 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
           ...(profile.skills_offered || []),
           ...(profile.skills_wanted || [])
         ].some(skill => skill.toLowerCase().includes(query));
-        
+
         if (!nameMatch && !locationMatch && !skillsMatch) {
           return false;
         }
@@ -94,14 +94,18 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
               <Sparkles className="h-8 w-8 text-white" />
             </div>
           </div>
-          
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-4">
+
+          <h1
+            className="text-5xl font-bold mb-4 text-transparent bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text 
+             drop-shadow-lg transition-all duration-500 ease-in-out 
+             hover:scale-105 hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.35)]"
+          >
             Skill Swap Network
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Connect with fellow learners, share your expertise, and master new skills through collaborative learning.
           </p>
-          
+
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-0">
@@ -111,7 +115,7 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
                 <div className="text-sm text-blue-700 dark:text-blue-300">Active Users</div>
               </CardContent>
             </Card>
-            
+
             <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-0">
               <CardContent className="p-4 text-center">
                 <TrendingUp className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -119,7 +123,7 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
                 <div className="text-sm text-green-700 dark:text-green-300">Available Skills</div>
               </CardContent>
             </Card>
-            
+
             <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 border-0">
               <CardContent className="p-4 text-center">
                 <Star className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
@@ -129,7 +133,7 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
                 <div className="text-sm text-yellow-700 dark:text-yellow-300">Avg Rating</div>
               </CardContent>
             </Card>
-            
+
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-0">
               <CardContent className="p-4 text-center">
                 <Zap className="h-8 w-8 text-purple-600 mx-auto mb-2" />
@@ -179,10 +183,10 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
               {filteredProfiles.length} {filteredProfiles.length === 1 ? 'profile' : 'profiles'}
             </Badge>
           </div>
-          
+
           {(searchQuery || Object.keys(filters).length > 0) && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setSearchQuery('');
                 setFilters({});
@@ -217,8 +221,8 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
                   : "No public profiles are available yet."}
               </p>
               {(searchQuery || Object.keys(filters).length > 0) && (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setSearchQuery('');
                     setFilters({});
