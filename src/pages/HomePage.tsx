@@ -10,10 +10,11 @@ import { Badge } from "@/components/ui/badge";
 interface HomePageProps {
   currentUser: any;
   profiles: any[];
+  requests?: any[];
   onSendRequest: (request: any) => void;
 }
 
-export function HomePage({ currentUser, profiles, onSendRequest }: HomePageProps) {
+export function HomePage({ currentUser, profiles, requests = [], onSendRequest }: HomePageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<any>({});
 
@@ -200,6 +201,7 @@ export function HomePage({ currentUser, profiles, onSendRequest }: HomePageProps
                 key={profile.user_id}
                 profile={profile}
                 currentUser={currentUser}
+                requests={requests}
                 onSendRequest={onSendRequest}
               />
             ))}

@@ -449,6 +449,7 @@ const App = () => {
                   <HomePage 
                     currentUser={userProfile}
                     profiles={profiles}
+                    requests={requests}
                     onSendRequest={handleSendRequest}
                   />
                 } 

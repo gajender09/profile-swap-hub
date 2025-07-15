@@ -23,10 +23,12 @@ interface RequestCardProps {
   currentUserId: string;
   onAccept?: (requestId: string) => void;
   onReject?: (requestId: string) => void;
+  onCancel?: (requestId: string) => void;
 }
 
-export function RequestCard({ request, currentUserId, onAccept, onReject }: RequestCardProps) {
+export function RequestCard({ request, currentUserId, onAccept, onReject, onCancel }: RequestCardProps) {
   const isReceiver = request.toUserId === currentUserId;
+  const isSender = request.fromUserId === currentUserId;
   const otherUser = isReceiver 
     ? { name: request.fromUserName, avatar: request.fromUserAvatar }
     : { name: request.toUserName, avatar: request.toUserAvatar };
@@ -112,28 +114,45 @@ export function RequestCard({ request, currentUserId, onAccept, onReject }: Requ
           </div>
         )}
 
-        {isReceiver && request.status === 'pending' && (
-          <div className="flex gap-2">
-            <Button 
-              size="sm" 
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => onAccept?.(request.id)}
-              disabled={!onAccept}
-            >
-              <Check className="h-4 w-4 mr-1" />
-              Accept
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="flex-1 text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950/50"
-              onClick={() => onReject?.(request.id)}
-              disabled={!onReject}
-            >
-              <X className="h-4 w-4 mr-1" />
-              Reject
-            </Button>
-          </div>
+        {request.status === 'pending' && (
+          <>
+            {isReceiver && (
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => onAccept?.(request.id)}
+                  disabled={!onAccept}
+                >
+                  <Check className="h-4 w-4 mr-1" />
+                  Accept
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1 text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950/50"
+                  onClick={() => onReject?.(request.id)}
+                  disabled={!onReject}
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Reject
+                </Button>
+              </div>
+            )}
+            {isSender && onCancel && (
+              <div className="flex justify-end">
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950/50"
+                  onClick={() => onCancel(request.id)}
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Cancel Request
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>

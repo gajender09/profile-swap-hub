@@ -20,14 +20,22 @@ interface SkillCardProps {
     total_swaps?: number;
   };
   currentUser?: any;
+  requests?: any[];
   onSendRequest: (request: any) => void;
 }
 
-export function SkillCard({ profile, currentUser, onSendRequest }: SkillCardProps) {
+export function SkillCard({ profile, currentUser, requests = [], onSendRequest }: SkillCardProps) {
   const [showRequestModal, setShowRequestModal] = useState(false);
 
   const isOwnProfile = currentUser?.user_id === profile.user_id;
   const currentUserSkills = currentUser?.skills_offered || [];
+  
+  // Check for existing pending request
+  const existingRequest = requests.find(request => 
+    request.fromUserId === currentUser?.user_id && 
+    request.toUserId === profile.user_id &&
+    request.status === 'pending'
+  );
 
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
@@ -166,14 +174,27 @@ export function SkillCard({ profile, currentUser, onSendRequest }: SkillCardProp
 
           {/* Action Button */}
           {!isOwnProfile && currentUser && (
-            <Button 
-              onClick={() => setShowRequestModal(true)}
-              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-              disabled={currentUserSkills.length === 0}
-            >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Request Skill Swap
-            </Button>
+            <>
+              {existingRequest ? (
+                <div className="text-center py-3">
+                  <Badge variant="outline" className="border-yellow-300 text-yellow-800 bg-yellow-50 dark:border-yellow-700 dark:text-yellow-200 dark:bg-yellow-950/50">
+                    Request Pending
+                  </Badge>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    You have a pending request with this user
+                  </p>
+                </div>
+              ) : (
+                <Button 
+                  onClick={() => setShowRequestModal(true)}
+                  className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                  disabled={currentUserSkills.length === 0}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Request Skill Swap
+                </Button>
+              )}
+            </>
           )}
           
           {isOwnProfile && (
