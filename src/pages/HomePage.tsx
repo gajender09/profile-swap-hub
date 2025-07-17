@@ -85,103 +85,131 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
   }, [profiles, availableSkills]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-blue-950">
-      <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6">
-            <div className="bg-gradient-to-r from-primary to-secondary p-4 rounded-full shadow-lg">
-              <Sparkles className="h-8 w-8 text-white" />
-            </div>
-          </div>
-
-          <h1
-             className="text-6xl font-extrabold mb-6 leading-tight 
-             bg-gradient-to-r from-[#0f172a] via-[#3b82f6] to-[#0f172a] 
-             bg-clip-text text-transparent 
-             drop-shadow-md transition-all duration-500 ease-in-out 
-             hover:scale-105"
-          >
-            Skill Swap Network
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Connect with fellow learners, share your expertise, and master new skills through collaborative learning.
-          </p>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-0">
-              <CardContent className="p-4 text-center">
-                <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{stats.totalUsers}</div>
-                <div className="text-sm text-blue-700 dark:text-blue-300">Active Users</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-0">
-              <CardContent className="p-4 text-center">
-                <TrendingUp className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-900 dark:text-green-100">{stats.totalSkills}</div>
-                <div className="text-sm text-green-700 dark:text-green-300">Available Skills</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 border-0">
-              <CardContent className="p-4 text-center">
-                <Star className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
-                  {stats.avgRating.toFixed(1)}
+    <div className="min-h-screen bg-background">
+      {/* Hero Section with Modern Gradient */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 gradient-hero opacity-5 dark:opacity-10"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        
+        <div className="container mx-auto px-4 py-16 relative">
+          {/* Hero Content */}
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-8">
+              <div className="relative">
+                <div className="absolute -inset-2 gradient-primary rounded-full blur-xl opacity-30 animate-glow"></div>
+                <div className="relative bg-primary p-6 rounded-full shadow-xl">
+                  <Sparkles className="h-10 w-10 text-primary-foreground" />
                 </div>
-                <div className="text-sm text-yellow-700 dark:text-yellow-300">Avg Rating</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-0">
-              <CardContent className="p-4 text-center">
-                <Zap className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">{stats.totalSwaps}</div>
-                <div className="text-sm text-purple-700 dark:text-purple-300">Completed Swaps</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {!currentUser && (
-            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 mb-8">
-              <h3 className="text-lg font-semibold mb-2">Ready to start learning?</h3>
-              <p className="text-muted-foreground mb-4">
-                Join our community of learners and start swapping skills today!
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button asChild className="bg-gradient-to-r from-primary to-secondary">
-                  <a href="/register">
-                    Join Now <ArrowRight className="h-4 w-4 ml-2" />
-                  </a>
-                </Button>
-                <Button variant="outline" asChild>
-                  <a href="/login">Sign In</a>
-                </Button>
               </div>
             </div>
-          )}
+
+            <h1 className="text-5xl md:text-7xl font-extrabold mb-8 leading-tight text-gradient animate-slide-down">
+              Skill Swap Network
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 animate-slide-up">
+              Connect with fellow learners, share your expertise, and master new skills through 
+              <span className="text-primary font-semibold"> collaborative learning</span>.
+            </p>
+
+            {/* Enhanced Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-16">
+              <Card className="glass border-0 hover:shadow-glow transition-all duration-300 group hover:scale-105">
+                <CardContent className="p-6 text-center">
+                  <div className="relative mb-4">
+                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg group-hover:blur-xl transition-all"></div>
+                    <Users className="h-10 w-10 text-primary mx-auto relative z-10" />
+                  </div>
+                  <div className="text-3xl font-bold text-foreground mb-1">{stats.totalUsers}</div>
+                  <div className="text-sm font-medium text-muted-foreground">Active Learners</div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass border-0 hover:shadow-glow transition-all duration-300 group hover:scale-105">
+                <CardContent className="p-6 text-center">
+                  <div className="relative mb-4">
+                    <div className="absolute inset-0 bg-accent/20 rounded-full blur-lg group-hover:blur-xl transition-all"></div>
+                    <TrendingUp className="h-10 w-10 text-accent mx-auto relative z-10" />
+                  </div>
+                  <div className="text-3xl font-bold text-foreground mb-1">{stats.totalSkills}</div>
+                  <div className="text-sm font-medium text-muted-foreground">Unique Skills</div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass border-0 hover:shadow-glow transition-all duration-300 group hover:scale-105">
+                <CardContent className="p-6 text-center">
+                  <div className="relative mb-4">
+                    <div className="absolute inset-0 bg-yellow-500/20 rounded-full blur-lg group-hover:blur-xl transition-all"></div>
+                    <Star className="h-10 w-10 text-yellow-500 mx-auto relative z-10" />
+                  </div>
+                  <div className="text-3xl font-bold text-foreground mb-1">
+                    {stats.avgRating.toFixed(1)}
+                  </div>
+                  <div className="text-sm font-medium text-muted-foreground">Avg Rating</div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass border-0 hover:shadow-glow transition-all duration-300 group hover:scale-105">
+                <CardContent className="p-6 text-center">
+                  <div className="relative mb-4">
+                    <div className="absolute inset-0 bg-success/20 rounded-full blur-lg group-hover:blur-xl transition-all"></div>
+                    <Zap className="h-10 w-10 text-success mx-auto relative z-10" />
+                  </div>
+                  <div className="text-3xl font-bold text-foreground mb-1">{stats.totalSwaps}</div>
+                  <div className="text-sm font-medium text-muted-foreground">Skill Swaps</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* CTA Section for Non-authenticated Users */}
+            {!currentUser && (
+              <div className="glass rounded-xl p-8 max-w-2xl mx-auto border border-primary/20">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="h-1 w-16 gradient-primary rounded-full"></div>
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Ready to start your learning journey?</h3>
+                <p className="text-muted-foreground mb-8 text-lg">
+                  Join thousands of learners exchanging skills and growing together in our vibrant community.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button variant="gradient" size="lg" asChild className="text-white">
+                    <a href="/register">
+                      Start Learning <ArrowRight className="h-5 w-5 ml-2" />
+                    </a>
+                  </Button>
+                  <Button variant="outline" size="lg" asChild>
+                    <a href="/login">Sign In</a>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Section */}
+      <div className="container mx-auto px-4 pb-16">
+        {/* Announcements */}
+        <div className="mb-8">
+          <AnnouncementBanner />
         </div>
 
-        {/* Announcements */}
-        <AnnouncementBanner />
+        {/* Search and Filters Section */}
+        <div className="mb-8">
+          <SearchFilters
+            onSearch={setSearchQuery}
+            onFilterChange={setFilters}
+            availableSkills={availableSkills}
+          />
+        </div>
 
-        {/* Search and Filters */}
-        <SearchFilters
-          onSearch={setSearchQuery}
-          onFilterChange={setFilters}
-          availableSkills={availableSkills}
-        />
-
-        {/* Results Summary */}
-        <div className="flex items-center justify-between mb-6">
+        {/* Results Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
           <div className="flex items-center space-x-4">
-            <h2 className="text-2xl font-bold">
-              {searchQuery || Object.keys(filters).length > 0 ? 'Search Results' : 'All Profiles'}
+            <h2 className="text-3xl font-bold">
+              {searchQuery || Object.keys(filters).length > 0 ? 'Search Results' : 'Discover Talents'}
             </h2>
-            <Badge variant="secondary" className="text-lg px-3 py-1">
+            <Badge variant="secondary" className="text-base px-4 py-2 font-medium">
               {filteredProfiles.length} {filteredProfiles.length === 1 ? 'profile' : 'profiles'}
             </Badge>
           </div>
@@ -189,42 +217,46 @@ export function HomePage({ currentUser, profiles, requests = [], onSendRequest }
           {(searchQuery || Object.keys(filters).length > 0) && (
             <Button
               variant="outline"
+              size="lg"
               onClick={() => {
                 setSearchQuery('');
                 setFilters({});
               }}
+              className="shrink-0"
             >
-              Clear Search
+              Clear Filters
             </Button>
           )}
         </div>
 
         {/* Profiles Grid */}
         {filteredProfiles.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProfiles.map((profile) => (
-              <SkillCard
-                key={profile.user_id}
-                profile={profile}
-                currentUser={currentUser}
-                requests={requests}
-                onSendRequest={onSendRequest}
-              />
+              <div key={profile.user_id} className="animate-fade-in">
+                <SkillCard
+                  profile={profile}
+                  currentUser={currentUser}
+                  requests={requests}
+                  onSendRequest={onSendRequest}
+                />
+              </div>
             ))}
           </div>
         ) : (
-          <Card className="text-center py-12">
+          <Card className="glass border-0 text-center py-20 animate-fade-in">
             <CardContent>
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold mb-2">No profiles found</h3>
-              <p className="text-muted-foreground mb-4">
+              <div className="text-8xl mb-6 opacity-50">🔍</div>
+              <h3 className="text-2xl font-bold mb-4">No profiles found</h3>
+              <p className="text-muted-foreground mb-8 text-lg max-w-md mx-auto">
                 {searchQuery || Object.keys(filters).length > 0
-                  ? "Try adjusting your search criteria or filters."
-                  : "No public profiles are available yet."}
+                  ? "Try adjusting your search criteria or filters to find more matches."
+                  : "No public profiles are available yet. Be the first to share your skills!"}
               </p>
               {(searchQuery || Object.keys(filters).length > 0) && (
                 <Button
-                  variant="outline"
+                  variant="gradient"
+                  size="lg"
                   onClick={() => {
                     setSearchQuery('');
                     setFilters({});

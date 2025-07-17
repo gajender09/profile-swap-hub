@@ -1,104 +1,149 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Star } from "lucide-react";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Rating } from "@/components/ui/rating"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Star, User } from "lucide-react"
+import { supabase } from "@/integrations/supabase/client"
+import { useToast } from "@/hooks/use-toast"
 
 interface RatingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  swapRequest: any;
-  currentUserId: string;
-  onSubmit: (rating: number, feedback: string) => void;
+  isOpen: boolean
+  onClose: () => void
+  swapRequest: any
+  currentUser: any
+  onRatingSubmitted?: () => void
 }
 
-export function RatingModal({ isOpen, onClose, swapRequest, currentUserId, onSubmit }: RatingModalProps) {
-  const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState('');
-  const [hoveredRating, setHoveredRating] = useState(0);
+export function RatingModal({
+  isOpen,
+  onClose,
+  swapRequest,
+  currentUser,
+  onRatingSubmitted
+}: RatingModalProps) {
+  const [rating, setRating] = useState(0)
+  const [feedback, setFeedback] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
 
-  const otherUser = swapRequest?.fromUserId === currentUserId 
-    ? { name: swapRequest.toUserName, id: swapRequest.toUserId }
-    : { name: swapRequest.fromUserName, id: swapRequest.fromUserId };
+  const ratedUser = swapRequest?.from_user_id === currentUser?.id 
+    ? swapRequest?.to_profile 
+    : swapRequest?.from_profile
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (rating === 0) return;
-    
-    onSubmit(rating, feedback.trim());
-    
-    // Reset form
-    setRating(0);
-    setFeedback('');
-    onClose();
-  };
+  const handleSubmit = async () => {
+    if (rating === 0) {
+      toast({
+        title: "Rating Required",
+        description: "Please select a rating before submitting.",
+        variant: "destructive",
+      })
+      return
+    }
 
-  const renderStars = () => {
-    return Array.from({ length: 5 }, (_, index) => {
-      const starValue = index + 1;
-      const isFilled = starValue <= (hoveredRating || rating);
+    setIsSubmitting(true)
+
+    try {
+      const { error } = await supabase
+        .from('swap_ratings')
+        .insert({
+          swap_request_id: swapRequest.id,
+          rater_user_id: currentUser.id,
+          rated_user_id: ratedUser?.user_id,
+          rating,
+          feedback: feedback.trim() || null,
+        })
+
+      if (error) throw error
+
+      toast({
+        title: "Rating Submitted",
+        description: "Thank you for your feedback!",
+      })
+
+      setRating(0)
+      setFeedback("")
+      onClose()
+      onRatingSubmitted?.()
       
-      return (
-        <Star
-          key={index}
-          className={`h-8 w-8 cursor-pointer transition-colors ${
-            isFilled 
-              ? 'fill-yellow-400 text-yellow-400' 
-              : 'text-gray-300 hover:text-yellow-300'
-          }`}
-          onClick={() => setRating(starValue)}
-          onMouseEnter={() => setHoveredRating(starValue)}
-          onMouseLeave={() => setHoveredRating(0)}
-        />
-      );
-    });
-  };
+    } catch (error: any) {
+      console.error('Error submitting rating:', error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit rating.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (!ratedUser) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md glass">
         <DialogHeader>
-          <DialogTitle>Rate Your Experience</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-yellow-500" />
+            Rate Your Experience
+          </DialogTitle>
           <DialogDescription>
-            How was your skill swap with {otherUser?.name}?
+            Share your experience with this skill swap
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label>Rating</Label>
-            <div className="flex items-center space-x-1">
-              {renderStars()}
-            </div>
-            {rating > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={ratedUser.avatar_url} />
+              <AvatarFallback>
+                <User className="h-6 w-6" />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-semibold">{ratedUser.name}</p>
               <p className="text-sm text-muted-foreground">
-                {rating} out of 5 stars
+                Skill: {swapRequest.their_skill}
               </p>
-            )}
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="feedback">Feedback (optional)</Label>
+            <label className="text-sm font-medium">Rate this experience</label>
+            <div className="flex justify-center">
+              <Rating value={rating} onChange={setRating} size="lg" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Feedback (optional)</label>
             <Textarea
-              id="feedback"
-              placeholder="Share your experience with this skill swap..."
+              placeholder="Share your thoughts..."
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              rows={4}
+              rows={3}
             />
           </div>
+        </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={rating === 0}>
-              Submit Rating
-            </Button>
-          </DialogFooter>
-        </form>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0}>
+            {isSubmitting ? "Submitting..." : "Submit Rating"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
